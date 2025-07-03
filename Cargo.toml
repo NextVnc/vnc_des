@@ -1,0 +1,57 @@
+[package]
+name = "vnc_des"
+version = "0.1.0"
+edition = "2021"
+authors = ["SpenserCai"]
+description = "A modular VNC DES encryption library compliant with VNC protocol standard (RFC 6143)"
+license = "MIT"
+repository = "https://github.com/spensercai/vnc_des"
+documentation = "https://docs.rs/vnc_des"
+readme = "README.md"
+keywords = ["vnc", "des", "encryption", "protocol", "crypto"]
+categories = ["cryptography", "network-programming"]
+rust-version = "1.70"
+
+[[bin]]
+name = "vnc_des_tool"
+path = "src/bin/vnc_des_tool.rs"
+
+[lib]
+name = "vnc_des"
+path = "src/lib.rs"
+
+[dependencies]
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# CLI for executable
+clap = { version = "4.0", features = ["derive"] }
+
+# Serialization for configuration
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Async runtime (for future extensibility)
+tokio = { version = "1.0", features = ["macros", "rt"], optional = true }
+
+# Encoding utilities
+hex = "0.4"
+
+[dev-dependencies]
+# Testing
+criterion = "0.5"
+
+[features]
+default = []
+async = ["tokio"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[profile.dev]
+opt-level = 0
+debug = true
+overflow-checks = true 
