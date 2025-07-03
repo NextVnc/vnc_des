@@ -72,26 +72,36 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 # 从源码编译
 git clone https://github.com/your-repo/vnc_des.git
 cd vnc_des
+
+# 方法1: 使用 Makefile (推荐)
+make release              # 本地平台编译
+make windows              # Windows 交叉编译
+make macos                # macOS 交叉编译  
+make linux                # Linux 交叉编译
+
+# 方法2: 直接使用 Cargo
 cargo build --release
 ```
 
 #### 基本命令
 
 ```bash
-# 加密密码
+# 使用 Makefile 构建后的可执行文件（推荐）
+./release/aarch64-apple-darwin/bin/vnc_des_tool encrypt "password"
+./release/aarch64-apple-darwin/bin/vnc_des_tool decrypt "dbd83cfd727a1458"
+./release/aarch64-apple-darwin/bin/vnc_des_tool verify "password" "dbd83cfd727a1458"
+
+# 或者使用快捷命令
+make run-release
+
+# 使用 Cargo 构建的可执行文件
 ./target/release/vnc_des_tool encrypt "password"
-
-# 解密密码
 ./target/release/vnc_des_tool decrypt "dbd83cfd727a1458"
-
-# 验证密码
 ./target/release/vnc_des_tool verify "password" "dbd83cfd727a1458"
 
-# 演示功能
-./target/release/vnc_des_tool demo
-
-# 查看帮助
-./target/release/vnc_des_tool --help
+# 通用命令
+vnc_des_tool demo                    # 演示功能
+vnc_des_tool --help                  # 查看帮助
 ```
 
 #### 高级用法
@@ -149,31 +159,124 @@ vnc_des/
 │   │   └── vnc_des.rs      # 高级处理器
 │   └── bin/
 │       └── vnc_des_tool.rs # 命令行工具
+├── release/                # 编译输出目录（make 构建后生成）
+│   └── <platform>/         # 平台特定目录
+│       ├── bin/            # 可执行文件
+│       ├── lib/            # 库文件
+│       ├── docs/           # 文档
+│       └── examples/       # 示例脚本
 ├── Cargo.toml              # 项目配置
-└── README.md              # 项目文档
+├── Makefile                # 构建配置
+└── README.md               # 项目文档
 ```
 
 ## 🧪 测试
 
-运行所有测试：
+### 使用 Makefile（推荐）
 
 ```bash
+# 运行所有测试
+make test
+
+# 运行基准测试
+make bench
+
+# 完整构建和测试
+make all
+```
+
+### 使用 Cargo
+
+```bash
+# 运行所有测试
 cargo test
-```
 
-运行文档测试：
-
-```bash
+# 运行文档测试
 cargo test --doc
-```
 
-运行性能测试：
-
-```bash
+# 运行性能测试
 cargo test --release
+
+# 运行基准测试
+cargo bench
 ```
 
 ## 🔧 开发
+
+### Makefile 支持
+
+本项目提供了功能完整的Makefile，支持多种编译模式和平台交叉编译：
+
+```bash
+# 查看所有可用命令
+make help
+
+# 编译相关
+make release              # 发布模式编译（二进制 + 库）
+make debug                # 调试模式编译
+make release-bin          # 仅编译二进制文件
+make lib                  # 仅编译库文件
+
+# 多平台交叉编译
+make windows              # Windows 平台 (x86_64-pc-windows-gnu)
+make macos                # macOS 平台 (aarch64-apple-darwin)
+make macos-intel          # macOS Intel (x86_64-apple-darwin)
+make linux                # Linux 平台 (x86_64-unknown-linux-gnu)
+make all-platforms        # 编译所有支持的平台
+
+# 开发工具
+make test                 # 运行所有测试
+make bench                # 运行基准测试
+make format               # 代码格式化
+make lint                 # 代码检查
+make check                # 快速检查项目
+make docs                 # 生成文档
+
+# 项目管理
+make clean                # 清理构建产物
+make info                 # 显示项目信息
+make package              # 创建发布包
+make install              # 安装到系统
+make uninstall            # 从系统卸载
+
+# 运行和发布
+make run                  # 运行开发版本
+make run-release          # 运行发布版本
+make publish-check        # 检查发布准备
+make publish              # 发布到 crates.io
+```
+
+#### 编译输出
+
+使用Makefile编译后，文件会输出到 `release/<platform>/` 目录：
+
+```
+release/
+└── aarch64-apple-darwin/     # 平台特定目录
+    ├── bin/                  # 可执行文件
+    │   └── vnc_des_tool
+    ├── lib/                  # 库文件
+    │   └── libvnc_des.rlib
+    ├── docs/                 # 文档
+    ├── examples/             # 示例脚本
+    │   ├── example-encrypt.sh
+    │   └── example-decrypt.sh
+    ├── README.md
+    └── LICENSE
+```
+
+#### 特性控制
+
+```bash
+# 启用异步特性
+make release FEATURES=async
+
+# 指定目标架构
+make release TARGET_ARCH=x86_64-pc-windows-gnu
+
+# 组合使用
+make windows FEATURES=async
+```
 
 ### 本地开发
 
@@ -182,26 +285,29 @@ cargo test --release
 git clone https://github.com/your-repo/vnc_des.git
 cd vnc_des
 
-# 运行测试
-cargo test
+# 推荐：使用 Makefile 进行开发
+make all                  # 完整构建（格式化、检查、测试、编译、文档）
+make quick                # 快速构建（跳过测试和文档）
+make dev                  # 开发模式（自动重新编译）
 
-# 构建项目
-cargo build
-
-# 运行示例
-cargo run --bin vnc_des_tool demo
+# 或者直接使用 Cargo
+cargo test                # 运行测试
+cargo build               # 构建项目
+cargo run --bin vnc_des_tool demo  # 运行示例
 ```
 
-### 代码格式化
+### 代码质量工具
 
 ```bash
-cargo fmt
-```
+# 使用 Makefile（推荐）
+make format               # 代码格式化
+make lint                 # 代码检查（clippy）
+make test                 # 运行测试
 
-### 代码检查
-
-```bash
-cargo clippy
+# 或者直接使用 Cargo
+cargo fmt                 # 代码格式化
+cargo clippy              # 代码检查
+cargo test                # 运行测试
 ```
 
 ## 📊 性能
