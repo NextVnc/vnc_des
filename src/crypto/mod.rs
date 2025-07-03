@@ -7,4 +7,4 @@ pub mod vnc_des;
 
 // 重新导出主要类型
 pub use des::VncDesEngine;
-pub use vnc_des::{VncDesProcessor, PasswordProcessor}; 
+pub use vnc_des::{PasswordProcessor, VncDesProcessor};

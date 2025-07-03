@@ -46,7 +46,7 @@
 //! let config = VncDesConfig::new()
 //!     .with_hex_key("0123456789abcdef")?
 //!     .with_strict_mode(true);
-//! 
+//!
 //! let mut processor = VncDesProcessor::new(config);
 //! let encrypted = processor.encrypt_password("test")?;
 //!
@@ -102,8 +102,8 @@ pub mod error;
 
 // 重新导出主要类型以便外部使用
 pub use config::{VncDesConfig, VncDesConfigBuilder, TIGHTVNC_DEFAULT_KEY};
-pub use crypto::{VncDesEngine, VncDesProcessor, PasswordProcessor};
-pub use error::{VncDesError, Result};
+pub use crypto::{PasswordProcessor, VncDesEngine, VncDesProcessor};
+pub use error::{Result, VncDesError};
 
 // 版本信息
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -140,20 +140,20 @@ mod tests {
     fn test_basic_encryption() {
         let mut processor = VncDesProcessor::default();
         let password = "test123";
-        
+
         let encrypted = processor.encrypt_password(password).unwrap();
         let decrypted = processor.decrypt_password(&encrypted).unwrap();
-        
+
         assert_eq!(password, decrypted);
     }
 
     #[test]
     fn test_static_methods() {
         let password = "static"; // 使用8字符以内的密码，符合默认配置
-        
+
         let encrypted = PasswordProcessor::encrypt_with_default(password).unwrap();
         let decrypted = PasswordProcessor::decrypt_with_default(&encrypted).unwrap();
-        
+
         assert_eq!(password, decrypted);
     }
 
@@ -162,13 +162,13 @@ mod tests {
         let config = VncDesConfig::new()
             .with_strict_mode(true)
             .with_auto_truncate(false);
-        
+
         let mut processor = VncDesProcessor::new(config);
         let password = "test";
-        
+
         let encrypted = processor.encrypt_password(password).unwrap();
         let decrypted = processor.decrypt_password(&encrypted).unwrap();
-        
+
         assert_eq!(password, decrypted);
     }
-} 
+}

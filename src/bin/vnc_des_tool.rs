@@ -23,8 +23,8 @@
 use clap::{Arg, ArgMatches, Command};
 use std::process;
 use vnc_des::{
-    VncDesConfig, VncDesProcessor, PasswordProcessor, VncDesError,
-    TIGHTVNC_DEFAULT_KEY, info, version
+    info, version, PasswordProcessor, VncDesConfig, VncDesError, VncDesProcessor,
+    TIGHTVNC_DEFAULT_KEY,
 };
 
 fn main() {
@@ -62,26 +62,25 @@ fn build_cli() -> Command {
         .version(version())
         .about("VNC DES密码加密/解密工具")
         .long_about(format!(
-            "{}\n\n一个模块化、可扩展的VNC DES密码处理工具，支持可配置的密钥和多种操作模式。", 
+            "{}\n\n一个模块化、可扩展的VNC DES密码处理工具，支持可配置的密钥和多种操作模式。",
             info()
         ))
         .subcommand_required(true)
         .arg_required_else_help(true)
-        
         // 全局选项
         .arg(
             Arg::new("key")
                 .long("key")
                 .value_name("HEX_KEY")
                 .help("使用自定义16进制密钥（16字符）")
-                .global(true)
+                .global(true),
         )
         .arg(
             Arg::new("key_file")
                 .long("key-file")
                 .value_name("FILE")
                 .help("从配置文件读取密钥")
-                .global(true)
+                .global(true),
         )
         .arg(
             Arg::new("verbose")
@@ -89,9 +88,8 @@ fn build_cli() -> Command {
                 .long("verbose")
                 .help("显示详细信息")
                 .action(clap::ArgAction::SetTrue)
-                .global(true)
+                .global(true),
         )
-        
         // 加密子命令
         .subcommand(
             Command::new("encrypt")
@@ -102,17 +100,16 @@ fn build_cli() -> Command {
                         .help("要加密的明文密码")
                         .value_name("PASSWORD")
                         .required(true)
-                        .index(1)
+                        .index(1),
                 )
                 .arg(
                     Arg::new("quiet")
                         .short('q')
                         .long("quiet")
                         .help("静默模式，仅输出结果")
-                        .action(clap::ArgAction::SetTrue)
-                )
+                        .action(clap::ArgAction::SetTrue),
+                ),
         )
-        
         // 解密子命令
         .subcommand(
             Command::new("decrypt")
@@ -123,17 +120,16 @@ fn build_cli() -> Command {
                         .help("16进制格式的加密密码（16个字符）")
                         .value_name("HEX_PASSWORD")
                         .required(true)
-                        .index(1)
+                        .index(1),
                 )
                 .arg(
                     Arg::new("quiet")
                         .short('q')
                         .long("quiet")
                         .help("静默模式，仅输出结果")
-                        .action(clap::ArgAction::SetTrue)
-                )
+                        .action(clap::ArgAction::SetTrue),
+                ),
         )
-        
         // 验证子命令
         .subcommand(
             Command::new("verify")
@@ -144,24 +140,23 @@ fn build_cli() -> Command {
                         .help("明文密码")
                         .value_name("PASSWORD")
                         .required(true)
-                        .index(1)
+                        .index(1),
                 )
                 .arg(
                     Arg::new("hex_password")
                         .help("16进制格式的加密密码")
                         .value_name("HEX_PASSWORD")
                         .required(true)
-                        .index(2)
+                        .index(2),
                 )
                 .arg(
                     Arg::new("quiet")
                         .short('q')
                         .long("quiet")
                         .help("静默模式，仅输出结果")
-                        .action(clap::ArgAction::SetTrue)
-                )
+                        .action(clap::ArgAction::SetTrue),
+                ),
         )
-        
         // 演示子命令
         .subcommand(
             Command::new("demo")
@@ -171,10 +166,9 @@ fn build_cli() -> Command {
                     Arg::new("password")
                         .help("用于演示的密码（可选，默认使用 'demo123'）")
                         .value_name("PASSWORD")
-                        .index(1)
-                )
+                        .index(1),
+                ),
         )
-        
         // 配置子命令
         .subcommand(
             Command::new("config")
@@ -184,20 +178,20 @@ fn build_cli() -> Command {
                     Arg::new("show")
                         .long("show")
                         .help("显示当前配置")
-                        .action(clap::ArgAction::SetTrue)
+                        .action(clap::ArgAction::SetTrue),
                 )
                 .arg(
                     Arg::new("generate")
                         .long("generate")
                         .value_name("FILE")
-                        .help("生成配置文件")
+                        .help("生成配置文件"),
                 )
                 .arg(
                     Arg::new("validate")
                         .long("validate")
                         .value_name("FILE")
-                        .help("验证配置文件")
-                )
+                        .help("验证配置文件"),
+                ),
         )
 }
 
@@ -210,7 +204,7 @@ fn create_processor(matches: &ArgMatches) -> Result<VncDesProcessor, VncDesError
         }
         return VncDesProcessor::with_hex_key(hex_key);
     }
-    
+
     // 检查是否指定了配置文件
     if let Some(config_file) = matches.get_one::<String>("key_file") {
         if matches.get_flag("verbose") {
@@ -219,7 +213,7 @@ fn create_processor(matches: &ArgMatches) -> Result<VncDesProcessor, VncDesError
         let config = VncDesConfig::from_file(config_file)?;
         return Ok(VncDesProcessor::new(config));
     }
-    
+
     // 使用默认配置
     if matches.get_flag("verbose") {
         println!("🔧 使用默认VNC密钥: {}", hex::encode(TIGHTVNC_DEFAULT_KEY));
@@ -234,7 +228,7 @@ fn handle_encrypt(matches: &ArgMatches) -> Result<(), VncDesError> {
     let verbose = matches.get_flag("verbose");
 
     let mut processor = create_processor(matches)?;
-    
+
     // 加密密码
     let encrypted = processor.encrypt_password(password)?;
     let hex_string = VncDesProcessor::to_hex_string(&encrypted);
@@ -246,24 +240,27 @@ fn handle_encrypt(matches: &ArgMatches) -> Result<(), VncDesError> {
         // 详细模式，显示完整信息
         println!("🔐 VNC DES 密码加密");
         println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        
+
         if verbose {
             println!("🔧 使用密钥: {}", processor.config().key_as_hex());
         }
-        
+
         println!("📝 原始密码: '{}'", password);
         if password.len() > processor.config().max_password_length {
             let truncated = &password[..processor.config().max_password_length];
-            println!("⚠️  警告: 密码长度超过{}字符，已截断为: '{}'", 
-                processor.config().max_password_length, truncated);
+            println!(
+                "⚠️  警告: 密码长度超过{}字符，已截断为: '{}'",
+                processor.config().max_password_length,
+                truncated
+            );
         }
-        
+
         if verbose {
             println!("🔒 加密字节: {:?}", encrypted);
         }
         println!("🔤 十六进制: {}", hex_string);
         println!("✅ 加密完成");
-        
+
         // 验证加密正确性
         if verbose {
             match processor.decrypt_password(&encrypted) {
@@ -273,7 +270,7 @@ fn handle_encrypt(matches: &ArgMatches) -> Result<(), VncDesError> {
                     } else {
                         password
                     };
-                    
+
                     if decrypted == expected {
                         println!("✅ 验证: 加密解密一致");
                     } else {
@@ -299,7 +296,8 @@ fn handle_decrypt(matches: &ArgMatches) -> Result<(), VncDesError> {
     let mut processor = create_processor(matches)?;
 
     // 清理输入（移除空格，转为小写）
-    let clean_hex = hex_password.chars()
+    let clean_hex = hex_password
+        .chars()
         .filter(|c| !c.is_whitespace())
         .collect::<String>()
         .to_lowercase();
@@ -307,11 +305,11 @@ fn handle_decrypt(matches: &ArgMatches) -> Result<(), VncDesError> {
     if !quiet {
         println!("🔓 VNC DES 密码解密");
         println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        
+
         if verbose {
             println!("🔧 使用密钥: {}", processor.config().key_as_hex());
         }
-        
+
         println!("🔤 输入十六进制: {}", hex_password);
         if clean_hex != *hex_password {
             println!("🧹 清理后格式: {}", clean_hex);
@@ -348,23 +346,24 @@ fn handle_verify(matches: &ArgMatches) -> Result<(), VncDesError> {
     if !quiet {
         println!("🔍 VNC DES 密码验证");
         println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        
+
         if verbose {
             println!("🔧 使用密钥: {}", processor.config().key_as_hex());
         }
-        
+
         println!("📝 明文密码: '{}'", password);
         println!("🔤 加密密码: {}", hex_password);
     }
 
     // 解析十六进制
-    let clean_hex = hex_password.chars()
+    let clean_hex = hex_password
+        .chars()
         .filter(|c| !c.is_whitespace())
         .collect::<String>()
         .to_lowercase();
-    
+
     let encrypted = VncDesProcessor::from_hex_string(&clean_hex)?;
-    
+
     // 验证密码
     let is_match = processor.verify_password(password, &encrypted)?;
 
@@ -379,7 +378,7 @@ fn handle_verify(matches: &ArgMatches) -> Result<(), VncDesError> {
             println!("✅ 验证结果: 密码匹配");
         } else {
             println!("❌ 验证结果: 密码不匹配");
-            
+
             if verbose {
                 // 显示实际加密的结果用于调试
                 let actual_encrypted = processor.encrypt_password(password)?;
@@ -387,7 +386,7 @@ fn handle_verify(matches: &ArgMatches) -> Result<(), VncDesError> {
                 println!("🔍 实际加密结果: {}", actual_hex);
                 println!("🔍 预期加密结果: {}", clean_hex);
             }
-            
+
             process::exit(1);
         }
     }
@@ -397,25 +396,29 @@ fn handle_verify(matches: &ArgMatches) -> Result<(), VncDesError> {
 
 /// 处理演示命令
 fn handle_demo(matches: &ArgMatches) -> Result<(), VncDesError> {
-    let password = matches.get_one::<String>("password")
+    let password = matches
+        .get_one::<String>("password")
         .map(|s| s.as_str())
         .unwrap_or("demo123");
 
     let processor = create_processor(matches)?;
-    
+
     println!("🎯 VNC DES 功能演示");
     println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-    
+
     // 显示库信息
     println!("📚 库信息: {}", info());
     println!();
-    
+
     // 显示配置信息
     println!("🔧 当前配置:");
     println!("   密钥: {}", processor.config().key_as_hex());
     println!("   严格模式: {}", processor.config().strict_mode);
     println!("   自动截断: {}", processor.config().auto_truncate);
-    println!("   最大密码长度: {}", processor.config().max_password_length);
+    println!(
+        "   最大密码长度: {}",
+        processor.config().max_password_length
+    );
     println!();
 
     // 执行演示
@@ -442,33 +445,33 @@ fn handle_config(matches: &ArgMatches) -> Result<(), VncDesError> {
         // 显示当前配置
         let processor = create_processor(matches)?;
         let config = processor.config();
-        
+
         println!("🔧 当前配置信息");
         println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         println!("密钥 (16进制): {}", config.key_as_hex());
         println!("严格模式: {}", config.strict_mode);
         println!("自动截断: {}", config.auto_truncate);
         println!("最大密码长度: {}", config.max_password_length);
-        
+
         println!();
         println!("配置JSON格式:");
         println!("{}", config.to_json()?);
-        
+
         return Ok(());
     }
-    
+
     if let Some(file_path) = matches.get_one::<String>("generate") {
         // 生成配置文件
         let config = VncDesConfig::default();
         config.save_to_file(file_path)?;
-        
+
         println!("✅ 配置文件已生成: {}", file_path);
         println!("📝 内容:");
         println!("{}", config.to_json()?);
-        
+
         return Ok(());
     }
-    
+
     if let Some(file_path) = matches.get_one::<String>("validate") {
         // 验证配置文件
         match VncDesConfig::from_file(file_path) {
@@ -485,16 +488,16 @@ fn handle_config(matches: &ArgMatches) -> Result<(), VncDesError> {
                 process::exit(1);
             }
         }
-        
+
         return Ok(());
     }
-    
+
     // 如果没有指定任何选项，显示帮助
     println!("请使用以下选项之一:");
     println!("  --show           显示当前配置");
     println!("  --generate FILE  生成配置文件");
     println!("  --validate FILE  验证配置文件");
-    
+
     Ok(())
 }
 
@@ -512,8 +515,10 @@ mod tests {
     fn test_processor_creation() {
         // 测试默认处理器创建（使用真实的CLI结构）
         let app = build_cli();
-        let matches = app.try_get_matches_from(vec!["vnc_des_tool", "demo"]).unwrap();
+        let matches = app
+            .try_get_matches_from(vec!["vnc_des_tool", "demo"])
+            .unwrap();
         let processor = create_processor(&matches).unwrap();
         assert_eq!(processor.config().encryption_key, TIGHTVNC_DEFAULT_KEY);
     }
-} 
+}
