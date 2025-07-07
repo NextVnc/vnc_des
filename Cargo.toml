@@ -2,7 +2,7 @@
 name = "vnc_des"
 version = "0.1.0"
 edition = "2021"
-authors = ["NextVnc Team <nextvnc@example.com>"]
+authors = ["NextVnc Team"]
 description = "A modular VNC DES encryption library compliant with VNC protocol standard (RFC 6143)"
 license = "MIT"
 repository = "https://github.com/nextvnc/vnc_des"

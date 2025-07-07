@@ -70,7 +70,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ```bash
 # 从源码编译
-git clone https://github.com/your-repo/vnc_des.git
+git clone https://github.com/NextVNC/vnc_des.git
 cd vnc_des
 
 # 方法1: 使用 Makefile (推荐)
@@ -282,7 +282,7 @@ make windows FEATURES=async
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-repo/vnc_des.git
+git clone https://github.com/NextVNC/vnc_des.git
 cd vnc_des
 
 # 推荐：使用 Makefile 进行开发
@@ -351,8 +351,7 @@ cargo test                # 运行测试
 
 如有问题或建议，请通过以下方式联系：
 
-- 提交 [Issue](https://github.com/your-repo/vnc_des/issues)
-- 发送邮件: your-email@example.com
+- 提交 [Issue](https://github.com/NextVNC/vnc_des/issues)
 
 ---
 
